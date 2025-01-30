@@ -12,7 +12,10 @@
 ;***********************************************************
 ;*	Internal Register Definitions and Constants
 ;***********************************************************
-.def	mpr = r16				; Multipurpose register is required for LCD Driver
+.def	mpr = r16				; Multipurpose register is required for LCD 
+.def	waitcnt = r17			; Wait Loop Counter
+.def	ilcnt = r18				; Inner Loop Counter
+.def	olcnt = r19				; Outer Loop Counter
 
 ;***********************************************************
 ;*	Start of Code Segment
@@ -49,6 +52,10 @@ MAIN:							; The Main program
 
 		; Display the strings on the LCD Display
 
+
+
+
+
 		rjmp	MAIN			; jump back to main and create an infinite
 								; while loop.  Generally, every main program is an
 								; infinite while loop, never let the main program
@@ -72,6 +79,35 @@ FUNC:							; Begin a function with a label
 		; in reverse order
 
 		ret						; End a function with RET
+
+
+;----------------------------------------------------------------
+; Sub:	Wait
+; Desc:	A wait loop that is 16 + 159975*waitcnt cycles or roughly
+;		waitcnt*10ms.  Just initialize wait for the specific amount
+;		of time in 10ms intervals. Here is the general eqaution
+;		for the number of clock cycles in the wait loop:
+;			(((((3*ilcnt)-1+4)*olcnt)-1+4)*waitcnt)-1+16
+;----------------------------------------------------------------
+Wait:
+		push	waitcnt			; Save wait register
+		push	ilcnt			; Save ilcnt register
+		push	olcnt			; Save olcnt register
+
+Loop:	ldi		olcnt, 224		; load olcnt register
+OLoop:	ldi		ilcnt, 237		; load ilcnt register
+ILoop:	dec		ilcnt			; decrement ilcnt
+		brne	ILoop			; Continue Inner Loop
+		dec		olcnt		; decrement olcnt
+		brne	OLoop			; Continue Outer Loop
+		dec		waitcnt		; Decrement wait
+		brne	Loop			; Continue Wait loop
+
+		pop		olcnt		; Restore olcnt register
+		pop		ilcnt		; Restore ilcnt register
+		pop		waitcnt		; Restore wait register
+		ret				; Return from subroutine
+
 
 ;***********************************************************
 ;*	Stored Program Data
