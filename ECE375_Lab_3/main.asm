@@ -2,6 +2,7 @@
 ;*	This is the skeleton file for Lab 3 of ECE 375
 ;*
 ;*	 Author: Andrew Gondoputro
+;			Harrison Gregory
 ;*	   Date: 1/30/2025
 ;*
 ;***********************************************************
